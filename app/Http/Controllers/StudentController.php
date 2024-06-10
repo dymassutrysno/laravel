@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Courses;
 use App\Models\Student;
 use Illuminate\Auth\Events\Validated;
 use Illuminate\Http\Request;
@@ -21,8 +22,16 @@ class StudentController extends Controller
 
     //method untuk menampilkan tambah form
     public function create(){
-        return view('admin.contents.student.create');
+
+        //mendapatkan data courses
+        $courses = Courses::all();
+
+        return view('admin.contents.student.create', [
+            'courses' => $courses,
+    ]);
+        
     }
+
     public function store(Request $request)
     {
         $request->validate([
@@ -30,7 +39,10 @@ class StudentController extends Controller
             'nim' => 'required|numeric',
             'major' => 'required',
             'class' => 'required',
+            'course_id' => 'nullable',
             ]);
+
+            
 
         //simpan data ke database
             Student::create([
@@ -38,6 +50,7 @@ class StudentController extends Controller
                 'nim' => $request->nim,
                 'major' => $request->major,
                 'class' => $request->class,
+                'courses_id' => $request->course_id,
             ]);
 
             return redirect('admin/student')->with('message', 'Data student berhasil ditambahkan!');
@@ -46,12 +59,20 @@ class StudentController extends Controller
     //method untuk menampilkan halaman edit
 
     public function edit($id){
+      
+
         //cari data student berdasarkan id
         $student = Student::find($id);//select * FROM students WHERE id = $id
 
+        //mendapatkan data courses
+        $courses = Courses::all();
+
+
         return view('admin.contents.student.edit', [
-            'student' => $student
+            'student' => $student, 'courses' => $courses
         ]);
+
+          
     }
 
     //method untuk menyimpan hasil update
@@ -64,6 +85,8 @@ class StudentController extends Controller
             'nim' => 'required|numeric',
             'major' => 'required',
             'class' => 'required',
+            'course_id' => 'nullable',
+
             ]);
 
             //simpan perubahan 
@@ -72,6 +95,8 @@ class StudentController extends Controller
                 'nim' => $request->nim,
                 'major' => $request->major,
                 'class' => $request->class,
+                'courses_id' => $request->course_id,
+
             ]);
             
             //kembalikan kehalaman student
